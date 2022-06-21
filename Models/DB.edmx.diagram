@@ -12,6 +12,7 @@
         <AssociationConnector Association="Test_InvoiceModel.FK_Customers_CustomerTypes" ManuallyRouted="false" />
         <AssociationConnector Association="Test_InvoiceModel.FK_Invoice_Customers" ManuallyRouted="false" />
         <AssociationConnector Association="Test_InvoiceModel.FK_InvoiceDetail_Invoice" ManuallyRouted="false" />
+        <AssociationConnector Association="Test_InvoiceModel.FK_InvoiceDetail_InvoiceDetail" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -18,10 +18,12 @@ namespace PruebaSchad.Models
         public int CustomerId { get; set; }
         public int Qty { get; set; }
         public decimal Price { get; set; }
-        public decimal TotalItbis { get; set; }
+        public Nullable<decimal> TotalItbis { get; set; }
         public decimal SubTotal { get; set; }
         public decimal Total { get; set; }
+        public int InvoiceId { get; set; }
+        public string Description { get; set; }
     
-        public virtual Invoice Invoice { get; set; }
+        public virtual Invoice Invoice1 { get; set; }
     }
 }

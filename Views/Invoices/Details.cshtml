@@ -1,50 +1,165 @@
-﻿@model PruebaSchad.Models.Invoice
+﻿@model PruebaSchad.Models.ViewModels.InvoiceViewModel
+
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = "Create";
 }
 
-<h2>Details</h2>
+<h2>Create Invoice</h2>
 
-<div>
-    <h4>Invoice</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.TotalItbis)
-        </dt>
+@using (Html.BeginForm("Create", "Invoices", FormMethod.Post, new { @id = "CreateInvoiceForm" }))
+{
+    @Html.AntiForgeryToken()
 
-        <dd>
-            @Html.DisplayFor(model => model.TotalItbis)
-        </dd>
+    <div class="form">
+        <h4>Invoices</h4>
+        <hr />
 
-        <dt>
-            @Html.DisplayNameFor(model => model.SubTotal)
-        </dt>
+        <div class="row">
 
-        <dd>
-            @Html.DisplayFor(model => model.SubTotal)
-        </dd>
+            <div class="form-group col-md-4">
+                @Html.LabelFor(model => model.CustomerId, "Customer", htmlAttributes: new { @class = "control-label" })
+                <div class="">
+                    @Html.DisplayFor(m => m.Customer)
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Total)
-        </dt>
+                </div>
+            </div>
 
-        <dd>
-            @Html.DisplayFor(model => model.Total)
-        </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Customer.CustName)
-        </dt>
+          
+        </div>
 
-        <dd>
-            @Html.DisplayFor(model => model.Customer.CustName)
-        </dd>
+        <div class="row">
+            <div class="form-group col-md-12">
+                <table id="tblInvoiceDetail" class="table table-bordered table-responsive table-hover">
+                    <tr>
+                        <th>Description </th>
+                        <th>Qty </th>
+                        <th>Price </th>
+                        @*<th>SubTotal</th>*@
+                        <th>Total</th>
 
-    </dl>
-</div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
+
+                    </tr>
+                    <tbody>
+                        @for (int a = 0; a < Model.InvoiceDetail.Count; a++)
+                        {
+                            <tr>
+                                <td style="width:20%;">@Html.DisplayFor(m => m.InvoiceDetail[a].Description, new { @class = "validateID" })</td>
+                                <td style="width:20%;">@Html.DisplayFor(m => m.InvoiceDetail[a].Qty, new { @class = "validateName QuantityRow", @type = "number" })</td>
+                                <td style="width:20%;">@Html.DisplayFor(m => m.InvoiceDetail[a].Price, new { @class = "validateContact DetailPrice", @type = "number" })</td>
+                                <td style="width:20%;">@Html.DisplayFor(m => (m.InvoiceDetail[a].Total), new { @class = "validateAddress TotalRow", @type = "number", @readonly = "true" })</td>
+                            </tr>
+
+                        }
+
+
+
+                    </tbody>
+
+
+
+                </table>
+
+                <div class="row">
+                    <div class="col-md-2 col-lg-offset-9">
+                        <strong>Total:</strong>
+                        @Html.DisplayFor(m => m.Total, new { @class = "", @id = "totalInvoice", @readonly = "true" })
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+}
+
+
+<script type="text/javascript">
+
+
+
+
+    $(function () {
+        $(".DetailPrice").keyup(calculateResult);
+        $(".DetailPrice").change(calculateResult);
+        $(".DetailPrice").keydown(calculateResult);
+    });
+
+
+    function AddRow() {
+        document.getElementById('AddLineText').checked = true;
+        document.getElementById("CreateInvoiceForm").submit();
+
+    }
+
+    function SaveInvoice() {
+        document.getElementById('AddLineText').checked = false;
+        document.getElementById("CreateInvoiceForm").submit();
+
+    }
+
+    function calculateResult() {
+        let quantity = 0;
+        let price = 0;
+        var tr = $(this).closest('tr');
+        $(tr).find('td').each(function () {
+            $(this).find('.QuantityRow').each(function () {
+                quantity = $(this).val();
+                console.log(quantity)
+            });
+
+            $(this).find('.DetailPrice').each(function () {
+                price = $(this).val();
+                console.log(price)
+            });
+
+
+            $(this).find('.TotalRow').each(function () {
+                price = $(this).val(quantity * price);
+            });
+        });
+
+        calculateTotal();
+    }
+
+    function Remove(button) {
+        //Determine the reference of the Row using the Button.
+        var row = $(button).closest("TR");
+        var name = $("TD", row).eq(0).html();
+        if (confirm("Do you want to delete this row ")) {
+            //Get the reference of the Table.
+            var table = $("#tblInvoiceDetail")[0];
+
+            //Delete the Table row using it's Index.
+            table.deleteRow(row[0].rowIndex);
+        }
+
+        calculateTotal();
+    };
+
+    function calculateTotal() {
+        console.log("Calculando el total");
+        var total = 0;
+        const columnIdx = 3;
+        $('#tblInvoiceDetail tbody tr').each(function () {
+
+            var value = $('td', this).eq(columnIdx).find('.TotalRow').each(function () {
+                total += parseFloat($(this).val());
+            });
+        });
+
+        console.log("Total", total);
+        $('#totalInvoice').val(total);
+
+
+
+
+
+    }
+
+
+</script>

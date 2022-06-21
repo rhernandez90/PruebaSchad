@@ -17,7 +17,7 @@ namespace PruebaSchad.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Invoice()
         {
-            this.InvoiceDetails = new HashSet<InvoiceDetail>();
+            this.InvoiceDetails1 = new HashSet<InvoiceDetail>();
         }
     
         public int Id { get; set; }
@@ -28,6 +28,6 @@ namespace PruebaSchad.Models
     
         public virtual Customer Customer { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<InvoiceDetail> InvoiceDetails { get; set; }
+        public virtual ICollection<InvoiceDetail> InvoiceDetails1 { get; set; }
     }
 }

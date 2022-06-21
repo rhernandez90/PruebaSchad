@@ -1,64 +1,220 @@
-﻿@model PruebaSchad.Models.Invoice
+﻿@model PruebaSchad.Models.ViewModels.InvoiceViewModel
+
 
 @{
     ViewBag.Title = "Create";
 }
 
-<h2>Create</h2>
+<h2>Create Invoice</h2>
 
-
-@using (Html.BeginForm()) 
+@using (Html.BeginForm("Create","Invoices",FormMethod.Post, new { @id = "CreateInvoiceForm"}))
 {
     @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Invoice</h4>
+
+    <div class="form">
+        <h4>Invoices</h4>
         <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="form-group">
-            @Html.LabelFor(model => model.CustomerId, "CustomerId", htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownList("CustomerId", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.CustomerId, "", new { @class = "text-danger" })
+
+        <div class="row">
+
+            <div class="form-group col-md-4">
+                @Html.LabelFor(model => model.CustomerId, "Customer", htmlAttributes: new { @class = "control-label" })
+                <div class="">
+                    @Html.DropDownList("CustomerId", null, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.CustomerId, "", new { @class = "text-danger" })
+                </div>
             </div>
+
+            <div class="form-group col-md-12">
+                <input class="btn btn-sm btn-success"
+                       id="btnAdd"
+                       type="button"
+                       value=" Add Line"
+                       onclick="AddRow()">
+
+            </div>
+            @Html.CheckBox("AddLine", false, new { @id = "AddLineText", style = "display: none;" })
         </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.TotalItbis, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.TotalItbis, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.TotalItbis, "", new { @class = "text-danger" })
+        <div class="row">
+            <div class="form-group col-md-12">
+                <table id="tblInvoiceDetail" class="table table-bordered table-responsive table-hover">
+                    <tr>
+                        <th>Description </th>
+                        <th>Qty </th>
+                        <th>Price </th>
+                        @*<th>SubTotal</th>*@
+                        <th >Total</th>
+                        <th></th>
+
+                    </tr>
+                    <tbody>
+                        @for (int a = 0; a < Model.InvoiceDetail.Count; a++)
+                        {
+                            <tr>
+                                <td style="width:20%;">@Html.TextBoxFor(m => m.InvoiceDetail[a].Description, new { @class = "validateID" })</td>
+                                <td style="width:20%;">@Html.TextBoxFor(m => m.InvoiceDetail[a].Qty, new { @class = "validateName QuantityRow", @type = "number" })</td>
+                                <td style="width:20%;">@Html.TextBoxFor(m => m.InvoiceDetail[a].Price, new { @class = "validateContact DetailPrice", @type = "number" })</td>
+                                <td style="width:20%;">@Html.TextBoxFor(m => (m.InvoiceDetail[a].Total), new { @class = "validateAddress TotalRow", @type = "number", @readonly="true" })</td>
+                                <td > <button onclick="Remove(this)" class="btn btn-sm btn-danger" type="button" >Delete</button> </td>
+                            </tr>
+
+                        }
+
+
+
+                    </tbody>
+
+
+
+                </table>
+
+                <div class="row">
+                    <div class="col-md-2 col-lg-offset-7">
+                        <strong>Total:</strong>
+                        @Html.TextBoxFor(m => m.Total, new { @class = "", @id ="totalInvoice", @readonly = "true" })
+                    </div>
+                </div>
+
             </div>
+
+            <div class="col-md-12">
+                <input class="btn btn-sm btn-primary pull-right"
+                       id="btnAdd"
+                       type="button"
+                       value=" Save Invoice"
+                       onclick="SaveInvoice()">
+            </div>
+
         </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.SubTotal, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.SubTotal, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.SubTotal, "", new { @class = "text-danger" })
-            </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Total, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Total, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Total, "", new { @class = "text-danger" })
-            </div>
-        </div>
 
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </div>
     </div>
 }
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}
+<script type="text/javascript">
+
+
+
+
+    $(function () {
+        $(".DetailPrice").keyup(calculateResult);
+        $(".DetailPrice").change(calculateResult);
+        $(".DetailPrice").keydown(calculateResult);
+    });
+
+
+    function AddRow() {
+        document.getElementById('AddLineText').checked = true;
+        document.getElementById("CreateInvoiceForm").submit();
+
+    }
+
+    function SaveInvoice() {
+        document.getElementById('AddLineText').checked = false;
+        document.getElementById("CreateInvoiceForm").submit();
+
+    }
+    //function AddLine() {
+    //    //Reference the Name and Country TextBoxes.
+    //    var txtName = $("#txtName");
+    //    var txtCountry = $("#txtCountry");
+
+    //    //Get the reference of the Table's TBODY element.
+    //    var tBody = $("#tblInvoiceDetail > TBODY")[0];
+
+    //    //Add Row.
+    //    var row = tBody.insertRow(-1);
+
+    //    //Add Name cell.
+    //    var cell = $(row.insertCell(-1));
+    //    cell.html("<input type='text' >");
+
+    //    //Add Country cell.
+    //    cell = $(row.insertCell(-1));
+    //    cell.html("<input class='QuantityRow' type='number' >");
+
+    //    cell = $(row.insertCell(-1));
+    //    cell.html("<input class='DetailPrice' type='number' >");
+
+    //    cell = $(row.insertCell(-1));
+    //    cell.html("<input class='TotalRow'  >");
+
+
+    //    //Add Button cell.
+    //    cell = $(row.insertCell(-1));
+    //    var btnRemove = $("<input class='btn btn-sm btn-danger' />");
+    //    btnRemove.attr("type", "button");
+    //    btnRemove.attr("onclick", "Remove(this);");
+    //    btnRemove.val("Delete");
+    //    cell.append(btnRemove);
+
+    //    //Clear the TextBoxes.
+    //    txtName.val("");
+    //    txtCountry.val("");
+    //}
+
+
+    function calculateResult() {
+        let quantity = 0;
+        let price = 0;
+        var tr = $(this).closest('tr');
+        $(tr).find('td').each(function () {
+            $(this).find('.QuantityRow').each(function () {
+                quantity = $(this).val();
+                console.log(quantity)
+            });
+
+            $(this).find('.DetailPrice').each(function () {
+                price = $(this).val();
+                console.log(price)
+            });
+
+
+            $(this).find('.TotalRow').each(function () {
+                price = $(this).val(quantity * price);
+            });
+        });
+
+        calculateTotal();
+    }
+
+    function Remove(button) {
+        //Determine the reference of the Row using the Button.
+        var row = $(button).closest("TR");
+        var name = $("TD", row).eq(0).html();
+        if (confirm("Do you want to delete this row ")) {
+            //Get the reference of the Table.
+            var table = $("#tblInvoiceDetail")[0];
+
+            //Delete the Table row using it's Index.
+            table.deleteRow(row[0].rowIndex);
+        }
+
+        calculateTotal();
+    };
+
+    function calculateTotal() {
+        console.log("Calculando el total");
+        var total = 0;
+        const columnIdx = 3;
+        $('#tblInvoiceDetail tbody tr').each(function () {
+
+            var value = $('td', this).eq(columnIdx).find('.TotalRow').each(function () {
+                total += parseFloat($(this).val());
+            });
+        });
+
+        console.log("Total", total);
+        $('#totalInvoice').val(total);
+
+
+
+
+
+    }
+
+
+</script>
